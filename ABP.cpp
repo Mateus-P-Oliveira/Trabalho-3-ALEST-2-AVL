@@ -206,23 +206,95 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
   cout << endl;
 }
 
-void ABP::AplicaBalanceamento() //Faz o balanceamento usando AVL
+void ABP::AplicaBalanceamento(NodoABP *auxGuia) //Faz o balanceamento usando AVL no nodo
 {
-  NodoABP *aux; // Cria um ponteiro auxiliar
-  aux = Raiz;//Faz ele apontar para a raiz
+  //Ler sobre https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
+  NodoABP *auxP, *aux; // Cria um ponteiro auxiliar
+  auxP = Raiz;//Faz ele apontar para a raiz
   while(1){ //Ira repetir os processos ate balancear a arvore
+    aux = auxGuia;
     int somaEsq = 0, somaDir = 0; // Salva o tamanho da arvore
-    somaEsq = ProfundidadeEsquerda(aux) - 1;//Calcula o tamanho da arvore
-    somaDir = ProfundidadeDireita(aux) - 1; //Calcula o tamanho da arvore        
+    somaEsq = ProfundidadeEsquerda(auxP) - 1;//Calcula o tamanho da arvore
+    somaDir = ProfundidadeDireita(auxP) - 1; //Calcula o tamanho da arvore  
+    cout << "Esq " << somaEsq << endl;
+    cout << "Dir " << somaDir << endl;
+    cout << "Dif " << abs(somaDir-somaEsq) << endl;      
     if(abs(somaDir - somaEsq) > 1){ //Vejo se elas estao desbalanceadas
-      if(somaDir > somaEsq){ //Rotacao EE
+      if(somaDir < somaEsq){ //Rotacao EE
+          if(aux == getRaiz()){// Testa se e raiz e o aux sao iguais
+              Raiz = aux->esq;              
+              if(Raiz->dir == nullptr){
+                 Raiz->dir = aux;
+                 aux->esq = nullptr;
+              }
+              else{
+                NodoABP *temp;
+                temp = Raiz->dir;
+                Raiz->dir = aux;
+                aux->esq = temp;
+              }   
+              auxP = Raiz;
+          }
+          else{
+             NodoABP *temp;
+             temp = aux->esq;
+             if(temp->dir == nullptr){
+               temp->dir = aux;
+               aux->esq = nullptr;
+             }
+             else{
+               NodoABP *temp2;
+               temp2 = temp->dir;
+               temp->dir = aux;
+               aux->esq = temp2;
+             }
+             auxP = temp;
 
+          }
       }
-      else{//Rotacao DE
+      else{//Rotacao DD
+          if(aux == getRaiz()){
+            Raiz = aux->dir;
+            if(Raiz->esq == nullptr){
+              Raiz->esq = aux;
+              aux->dir = nullptr;
+            }
+            else{
+              NodoABP *temp;
+              temp = Raiz->esq;
+              Raiz->esq = aux;
+              aux->dir = temp;
+            }
+            auxP = Raiz;
+          }
+          else{
+            NodoABP *temp;
+            temp = aux->dir;
+            if(temp->esq == nullptr){
+              temp->esq = aux;
+              aux->dir = nullptr;
+            }
+            else{
+              NodoABP *temp2;
+              temp2 = temp->esq;
+              temp->esq = aux;
+              aux->dir = temp2;
+            }
+            auxP = temp;
+          }
       
       }
+    }
+    else{
+      break;
     }
     
   }
   
+}
+
+void ABP::AplicaBalanceamento(){
+
+  AplicaBalanceamento(Raiz);
+
 }

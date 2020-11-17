@@ -18,6 +18,7 @@ int main() {
   B.GeraDOT();
   
   B.AplicaBalanceamento();
+  B.GeraDOT();
 
   //B.AplicaBalanceamento();
   //B.CaminhaCENTRAL();

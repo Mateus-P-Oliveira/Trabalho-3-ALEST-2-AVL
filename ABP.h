@@ -18,7 +18,7 @@ class ABP
   void CaminhaPOS(NodoABP *nodo);//Percorre o nodo usando o caminho pos fixado. Ver slides arvores de pesquisa binarias
   void GeraConexoesDOT(NodoABP *nodo);//Gera as conexoes do nodo que sera inserido no arquivo para imprimi-lo
   void GeraNodosDOT(NodoABP *nodo);//Gera o nodo para o codigo imprimi-lo
-  
+  void AplicaBalanceamento(NodoABP *nodo);//Balancea a arvore em AVL
 public:
   ABP (); //Cria a arvore sem nada 
   NodoABP* getRaiz(); // Retorna a raiz da arvore
@@ -35,7 +35,7 @@ public:
   void GeraNodosDOT();//Chama a funcao geranodosDOr
   void GeraDOT();//Cria o arquivo para ser lido nos digrafos chamando todas funcoes construtoras de dot
   void CaminhaPOS();//Chama a funcao Caminha Pos
-  void AplicaBalanceamento();//Faz o balanceamento usando AVL
+  void AplicaBalanceamento();//Chama a funcao para balancear a arvore
   int ProfundidadeEsquerda(NodoABP *n); // Calcula profundidade das sub arvores esquerdas
   int ProfundidadeDireita(NodoABP *n); // Calcula profundidade das sub arvores direitas
 };
