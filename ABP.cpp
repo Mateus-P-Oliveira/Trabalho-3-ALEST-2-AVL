@@ -205,95 +205,71 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
   CaminhaPOS(Raiz);
   cout << endl;
 }
-
-void ABP::AplicaBalanceamento(NodoABP *auxGuia) //Faz o balanceamento usando AVL no nodo
-{
-  //Ler sobre https://www.geeksforgeeks.org/avl-tree-set-1-insertion/
-  NodoABP *auxP, *aux; // Cria um ponteiro auxiliar
-  auxP = Raiz;//Faz ele apontar para a raiz
-  while(1){ //Ira repetir os processos ate balancear a arvore
-    aux = auxGuia;
-    int somaEsq = 0, somaDir = 0; // Salva o tamanho da arvore
-    somaEsq = ProfundidadeEsquerda(auxP) - 1;//Calcula o tamanho da arvore
-    somaDir = ProfundidadeDireita(auxP) - 1; //Calcula o tamanho da arvore  
-    cout << "Esq " << somaEsq << endl;
-    cout << "Dir " << somaDir << endl;
-    cout << "Dif " << abs(somaDir-somaEsq) << endl;      
-    if(abs(somaDir - somaEsq) > 1){ //Vejo se elas estao desbalanceadas
-      if(somaDir < somaEsq){ //Rotacao EE
-          if(aux == getRaiz()){// Testa se e raiz e o aux sao iguais
-              Raiz = aux->esq;              
-              if(Raiz->dir == nullptr){
-                 Raiz->dir = aux;
-                 aux->esq = nullptr;
-              }
-              else{
-                NodoABP *temp;
-                temp = Raiz->dir;
-                Raiz->dir = aux;
-                aux->esq = temp;
-              }   
-              auxP = Raiz;
-          }
-          else{
-             NodoABP *temp;
-             temp = aux->esq;
-             if(temp->dir == nullptr){
-               temp->dir = aux;
-               aux->esq = nullptr;
-             }
-             else{
-               NodoABP *temp2;
-               temp2 = temp->dir;
-               temp->dir = aux;
-               aux->esq = temp2;
-             }
-             auxP = temp;
-
-          }
-      }
-      else{//Rotacao DD
-          if(aux == getRaiz()){
-            Raiz = aux->dir;
-            if(Raiz->esq == nullptr){
-              Raiz->esq = aux;
-              aux->dir = nullptr;
-            }
-            else{
-              NodoABP *temp;
-              temp = Raiz->esq;
-              Raiz->esq = aux;
-              aux->dir = temp;
-            }
-            auxP = Raiz;
-          }
-          else{
-            NodoABP *temp;
-            temp = aux->dir;
-            if(temp->esq == nullptr){
-              temp->esq = aux;
-              aux->dir = nullptr;
-            }
-            else{
-              NodoABP *temp2;
-              temp2 = temp->esq;
-              temp->esq = aux;
-              aux->dir = temp2;
-            }
-            auxP = temp;
-          }
-      
-      }
-    }
-    else{
-      break;
-    }
+// ************************************ // So irei fazer as rotacoes nesse caso 
+//Em todos casos a e par de b 
+NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
+  if(a == getRaiz()) Raiz = b; // B que e o filho vira a nova raiz
     
+  if(b->dir == nullptr){ // Caso B nao tenha filho
+    b->dir = a; // A vira a raiz a direita de b
+    a->esq = nullptr; //A deixa sua raiz esquerda apontando para o vazio
   }
+  else{//Caso B tenha um filho
+    NodoABP *filho;
+    filho = b->dir;
+    b->dir = a;
+    a->esq = filho;
+    }
   
+  return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
+}
+// ************************************
+NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
+  if(a == getRaiz()) Raiz = b;//Caso A seja a raiz o B vira a raiz
+  
+  if(b->esq == nullptr){//Caso B nao tenha um filho
+    b->esq = a;
+    a->dir = nullptr;
+  }
+  else{//Caso b tenha um filho
+    NodoABP *filho;
+    filho = b->esq;
+    b->esq = a;
+    a->dir = filho;
+  }
+  return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
+}
+// ************************************
+NodoABP* ABP::RotacionaED(NodoABP *a, NodoABP *b){//Rotacao Esquerda-Direita
+  NodoABP *c, *y; //Nodo filho de b e nodo que sera retornado com a nova arvore
+  c = RotacionaDD(b,b->dir); //RotacaoDD na subarvore a esquerda
+  y = RotacionaEE(a,c); //RotacaoEE em toda arvore
+
+  return y;//Retorna o ponteiro para a nova arvore
+}
+// ************************************
+NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){
+  NodoABP *c, *y; //Nodo filho de b e nodo que sera retornado com a nova arvore
+
+  c= RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
+  y = RotacionaDD(a,c);//RotacaoDD em toda arvore
+
+  return y;
+}
+// ************************************
+
+void ABP::AplicaBalanceamento(NodoABP *n) //Faz o balanceamento usando AVL na arvore
+{
+  NodoABP* aux;
+ //int somaEsq = 0, somaDir = 0; // Salva o tamanho da arvore
+    //somaEsq = ProfundidadeEsquerda(auxP) - 1;//Calcula o tamanho da arvore
+    //somaDir = ProfundidadeDireita(auxP) - 1; //Calcula o tamanho da arvore
+  //aux = RotacionaEE(n,n->esq); //Teste
+  //aux = RotacionaEE(aux,aux->esq);
+  //aux = RotacionaDE(n,n->esq);
 }
 
-void ABP::AplicaBalanceamento(){
+void ABP::AplicaBalanceamento(){//Chama a funcao aplica balanceamento
 
   AplicaBalanceamento(Raiz);
 

@@ -38,5 +38,9 @@ public:
   void AplicaBalanceamento();//Chama a funcao para balancear a arvore
   int ProfundidadeEsquerda(NodoABP *n); // Calcula profundidade das sub arvores esquerdas
   int ProfundidadeDireita(NodoABP *n); // Calcula profundidade das sub arvores direitas
+  NodoABP *RotacionaEE(NodoABP *a, NodoABP *b);// Faz a Rotacao para Esquerda-Esquerda
+  NodoABP *RotacionaDD(NodoABP *a, NodoABP *b);// Faz a Rotacao para Direita-Direita
+  NodoABP *RotacionaED(NodoABP *a, NodoABP *b);// Faz a Rotacao para Esquerda-Direita
+  NodoABP *RotacionaDE(NodoABP *a, NodoABP *b); // Faz a Rotacao para Direita-Esquerda
 };
 #endif 

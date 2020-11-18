@@ -12,9 +12,11 @@ int main() {
 
   B.CaminhaPOS();
   B.CaminhaCENTRAL();
-  //B.insere(20);
-  //B.insere(5);
-  //B.insere(8);
+  B.insere(20);
+  B.insere(5);
+  B.insere(8);
+  B.insere(20);
+  B.insere(20);
   B.GeraDOT();
   
   B.AplicaBalanceamento();
