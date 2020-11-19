@@ -10,18 +10,18 @@ int main() {
   for(int i=10;i>5;i--)
         B.insere(i);
 
-  B.CaminhaPOS();
-  B.CaminhaCENTRAL();
+  
+  
   B.insere(20);
   B.insere(5);
   B.insere(8);
-  B.insere(20);
-  B.insere(20);
+  B.insere(11);
   B.GeraDOT();
-  
+  //B.CaminhaPOS();
+  //B.CaminhaCENTRAL();
   B.AplicaBalanceamento();
   B.GeraDOT();
-
+  
   //B.AplicaBalanceamento();
   //B.CaminhaCENTRAL();
   //B.GeraDOT();

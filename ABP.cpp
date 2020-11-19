@@ -33,6 +33,11 @@ void ABP::insere(int n) //Chama a funcao insere
   Raiz = insere(Raiz,n);
 }
 // ************************************
+int ABP::Altura(NodoABP *n){
+  if(n == nullptr) return 0;
+  return n->altura;
+}
+// ************************************
 NodoABP* ABP::insere(NodoABP *nodo, int n)//Insere o valor do nodo na arvore e decide para qual lado ele ira inserir de acordo com o tamnho de n
 {
   if (nodo == NULL) { // encontrou o local para inserir
@@ -46,6 +51,7 @@ NodoABP* ABP::insere(NodoABP *nodo, int n)//Insere o valor do nodo na arvore e d
           else 
             nodo->dir = insere(nodo->dir, n);
     }
+    nodo->altura = 1 + max(Altura(nodo->esq),Altura(nodo->dir));
     return nodo;
 }
 // ************************************
@@ -66,23 +72,23 @@ int ABP::CalculaProfundidade(NodoABP *n)// Calcula a profundidade da arvore
   else return 0;
 }
 // ************************************
-int ABP::ProfundidadeEsquerda(NodoABP *n){
+/*int ABP::ProfundidadeEsquerda(NodoABP *n){
   int alturaEsq;
   if(n != NULL){
     alturaEsq = ProfundidadeEsquerda(n->esq);
     return 1 + alturaEsq;
   }
   else return 0;
-}
+}*/
 // ************************************
-int ABP::ProfundidadeDireita(NodoABP *n){
+/*int ABP::ProfundidadeDireita(NodoABP *n){
   int alturaDir;
   if(n != NULL){
     alturaDir = ProfundidadeDireita(n->dir);
     return 1 + alturaDir;
   }
   else return 0;
-}
+}*/
 // ************************************
 int ABP::EncontraMenor() { //Encontra o nodo na ultima posicao
   NodoABP *aux = Raiz;
@@ -205,6 +211,8 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
   CaminhaPOS(Raiz);
   cout << endl;
 }
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+
 // ************************************ // So irei fazer as rotacoes nesse caso 
 //Em todos casos a e par de b 
 NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
@@ -213,12 +221,16 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
   if(b->dir == nullptr){ // Caso B nao tenha filho
     b->dir = a; // A vira a raiz a direita de b
     a->esq = nullptr; //A deixa sua raiz esquerda apontando para o vazio
+    b->pai = a->pai;//Define o pai do nodo b como sendo o pai de a
+    a->pai = b; //Define o pai do nodo a
   }
   else{//Caso B tenha um filho
     NodoABP *filho;
     filho = b->dir;
     b->dir = a;
     a->esq = filho;
+    b->pai = a->pai;
+    a->pai = b;
     }
   
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
@@ -230,12 +242,16 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
   if(b->esq == nullptr){//Caso B nao tenha um filho
     b->esq = a;
     a->dir = nullptr;
+    b->pai = a->pai;
+    a->pai = b;
   }
   else{//Caso b tenha um filho
     NodoABP *filho;
     filho = b->esq;
     b->esq = a;
     a->dir = filho;
+    b->pai = a->pai;
+    a->pai = b;
   }
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
@@ -251,26 +267,55 @@ NodoABP* ABP::RotacionaED(NodoABP *a, NodoABP *b){//Rotacao Esquerda-Direita
 NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){
   NodoABP *c, *y; //Nodo filho de b e nodo que sera retornado com a nova arvore
 
-  c= RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
+  c=  RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
   y = RotacionaDD(a,c);//RotacaoDD em toda arvore
 
   return y;
 }
 // ************************************
 
-void ABP::AplicaBalanceamento(NodoABP *n) //Faz o balanceamento usando AVL na arvore
-{
-  NodoABP* aux;
- //int somaEsq = 0, somaDir = 0; // Salva o tamanho da arvore
-    //somaEsq = ProfundidadeEsquerda(auxP) - 1;//Calcula o tamanho da arvore
-    //somaDir = ProfundidadeDireita(auxP) - 1; //Calcula o tamanho da arvore
-  //aux = RotacionaEE(n,n->esq); //Teste
-  //aux = RotacionaEE(aux,aux->esq);
-  //aux = RotacionaDE(n,n->esq);
+void ABP::CriaFilho(){//Chama a funcao que cria os filhos
+  CriaFilho(Raiz);
+}
+
+void ABP::CriaFilho(NodoABP *nodo){
+  if(nodo == NULL) return;
+  if(nodo->esq != nullptr) nodo->esq->pai = nodo;
+  if(nodo->dir != nullptr) nodo->dir->pai = nodo;  
+  CriaFilho(nodo->esq);
+  CriaFilho(nodo->dir); 
 }
 
 void ABP::AplicaBalanceamento(){//Chama a funcao aplica balanceamento
+  CriaFilho(); // Cria os filhos para os ponteiros nao se perderem
+  CaminhaPOSBalanceado(Raiz);
 
-  AplicaBalanceamento(Raiz);
+}
 
+int ABP::FatorBalanceamento(NodoABP *n){//Aplica o fator balanceamento so contando as arvores que contam
+  if(n == nullptr) return 0;
+  return Altura(n->esq) - Altura(n->dir);  
+}
+
+// *************************************
+void ABP::CaminhaPOSBalanceado(NodoABP *nodo)//Percorre o nodo usando o caminho pos fixado. Ver slides arvores de pesquisa binarias
+{   
+  
+  if(nodo == NULL) return;
+  
+  CaminhaPOSBalanceado(nodo->esq);
+  CaminhaPOSBalanceado(nodo->dir);  
+  //cout << nodo->info << endl;
+  if(FatorBalanceamento(nodo) > 1 && Altura(nodo->esq) > Altura(nodo->dir)){
+    
+    nodo = RotacionaEE(nodo,nodo->esq);
+    //cout << nodo->info << " ESQ" << endl;
+  }
+  if(FatorBalanceamento(nodo) > 1 && Altura(nodo->dir) > Altura(nodo->esq)){
+    
+    nodo = RotacionaDD(nodo,nodo->dir);
+    //cout << nodo->info << " Direita" << endl;
+  }
+  //out << "POS " << nodo->info << endl;
+  
 }

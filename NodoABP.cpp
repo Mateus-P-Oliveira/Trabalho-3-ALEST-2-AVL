@@ -9,6 +9,7 @@ NodoABP::NodoABP(int dado)
   dir = NULL;
   pai = NULL;
   info = dado; 
+  altura = 1;
 }  
 void NodoABP::imprime()
 {

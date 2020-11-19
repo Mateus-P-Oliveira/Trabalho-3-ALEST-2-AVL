@@ -7,7 +7,7 @@ class NodoABP{
     NodoABP *pai;
     NodoABP *esq;
     NodoABP *dir;
-
+    int altura;
     NodoABP(int dado);
     void imprime();
 };
