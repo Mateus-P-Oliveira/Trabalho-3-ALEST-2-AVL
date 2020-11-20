@@ -221,6 +221,7 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
   if(b->dir == nullptr){ // Caso B nao tenha filho
     b->dir = a; // A vira a raiz a direita de b
     a->esq = nullptr; //A deixa sua raiz esquerda apontando para o vazio
+    if(a != getRaiz()) a->pai->esq = b; // Faz o pai de a apontar para a esq
     b->pai = a->pai;//Define o pai do nodo b como sendo o pai de a
     a->pai = b; //Define o pai do nodo a
   }
@@ -229,10 +230,12 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
     filho = b->dir;
     b->dir = a;
     a->esq = filho;
+    if(a != getRaiz()) a->pai->esq = b; // Faz o pai de a apontar para a esq
     b->pai = a->pai;
     a->pai = b;
     }
-  
+  //a->altura = 1 + max(Altura(a->esq),Altura(a->dir));
+  //b->altura = 1 + max(Altura(b->esq),Altura(b->dir));
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
@@ -242,6 +245,7 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
   if(b->esq == nullptr){//Caso B nao tenha um filho
     b->esq = a;
     a->dir = nullptr;
+    if(a != getRaiz()) a->pai->dir = b;
     b->pai = a->pai;
     a->pai = b;
   }
@@ -250,9 +254,12 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
     filho = b->esq;
     b->esq = a;
     a->dir = filho;
+    if(a != getRaiz()) a->pai->dir = b;
     b->pai = a->pai;
     a->pai = b;
   }
+  //a->altura = 1 + max(Altura(a->esq),Altura(a->dir));
+  //b->altura = 1 + max(Altura(b->esq),Altura(b->dir));
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
@@ -309,13 +316,13 @@ void ABP::CaminhaPOSBalanceado(NodoABP *nodo)//Percorre o nodo usando o caminho 
   if(FatorBalanceamento(nodo) > 1 && Altura(nodo->esq) > Altura(nodo->dir)){
     
     nodo = RotacionaEE(nodo,nodo->esq);
-    //cout << nodo->info << " ESQ" << endl;
+    cout << nodo->info << " ESQ" << endl;
   }
   if(FatorBalanceamento(nodo) > 1 && Altura(nodo->dir) > Altura(nodo->esq)){
     
     nodo = RotacionaDD(nodo,nodo->dir);
-    //cout << nodo->info << " Direita" << endl;
+    cout << nodo->info << " Direita" << endl;
   }
-  //out << "POS " << nodo->info << endl;
+  //GeraDOT();
   
 }

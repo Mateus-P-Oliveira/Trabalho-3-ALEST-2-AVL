@@ -14,7 +14,7 @@ int main() {
   
   B.insere(20);
   B.insere(5);
-  B.insere(8);
+  //B.insere(8);
   B.insere(11);
   B.GeraDOT();
   //B.CaminhaPOS();
