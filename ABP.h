@@ -36,8 +36,6 @@ public:
   void GeraDOT();//Cria o arquivo para ser lido nos digrafos chamando todas funcoes construtoras de dot
   void CaminhaPOS();//Chama a funcao Caminha Pos
   void AplicaBalanceamento();//Chama a funcao para balancear a arvore
-  //int ProfundidadeEsquerda(NodoABP *n); // Calcula profundidade das sub arvores esquerdas
-  //int ProfundidadeDireita(NodoABP *n); // Calcula profundidade das sub arvores direitas
   NodoABP *RotacionaEE(NodoABP *a, NodoABP *b);// Faz a Rotacao para Esquerda-Esquerda
   NodoABP *RotacionaDD(NodoABP *a, NodoABP *b);// Faz a Rotacao para Direita-Direita
   NodoABP *RotacionaED(NodoABP *a, NodoABP *b);// Faz a Rotacao para Esquerda-Direita
@@ -46,5 +44,6 @@ public:
   int FatorBalanceamento(NodoABP *n);// Faz o fator balanceamento
   void CriaFilho();//Chama a funcao cria filho
   int Altura(NodoABP *n);//Calcula a altura do nodo
+  void AlteraAltura(NodoABP *n);//Altera a altura dos nodo
 };
 #endif 

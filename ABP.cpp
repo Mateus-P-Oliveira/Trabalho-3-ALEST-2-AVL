@@ -72,24 +72,6 @@ int ABP::CalculaProfundidade(NodoABP *n)// Calcula a profundidade da arvore
   else return 0;
 }
 // ************************************
-/*int ABP::ProfundidadeEsquerda(NodoABP *n){
-  int alturaEsq;
-  if(n != NULL){
-    alturaEsq = ProfundidadeEsquerda(n->esq);
-    return 1 + alturaEsq;
-  }
-  else return 0;
-}*/
-// ************************************
-/*int ABP::ProfundidadeDireita(NodoABP *n){
-  int alturaDir;
-  if(n != NULL){
-    alturaDir = ProfundidadeDireita(n->dir);
-    return 1 + alturaDir;
-  }
-  else return 0;
-}*/
-// ************************************
 int ABP::EncontraMenor() { //Encontra o nodo na ultima posicao
   NodoABP *aux = Raiz;
     // loop down to find the leftmost leaf
@@ -150,10 +132,10 @@ void ABP::GeraConexoesDOT(NodoABP *nodo) //Gera as conexoes do nodo que sera ins
     GeraConexoesDOT(nodo->esq);
     //   "nodeA":dir -> "nodeB";
     if (nodo->esq)
-        cout << "\"node" << nodo->info << "\":esq -> \"node" << nodo->esq->info << "\"" <<endl;
+        cout << "\"node" << nodo->info << "\":esq -> \"node" << nodo->esq->info << "\"" << "[ label = " << nodo->altura << "]" << endl;
     GeraConexoesDOT(nodo->dir);
     if (nodo->dir)
-        cout << "\"node" << nodo->info << "\":dir -> \"node" << nodo->dir->info << "\""<<endl;
+        cout << "\"node" << nodo->info << "\":dir -> \"node" << nodo->dir->info << "\""<< "[ label = " << nodo->altura << "]" << endl;
 }
 
 void ABP::GeraNodosDOT(NodoABP *nodo)//Gera o nodo para o codigo imprimi-lo
@@ -234,8 +216,10 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
     b->pai = a->pai;
     a->pai = b;
     }
-  //a->altura = 1 + max(Altura(a->esq),Altura(a->dir));
-  //b->altura = 1 + max(Altura(b->esq),Altura(b->dir));
+
+  AlteraAltura(a); //Recalcula a altura do nodo
+  AlteraAltura(b); //Recalcula a altura do nodo
+  
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
@@ -245,7 +229,7 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
   if(b->esq == nullptr){//Caso B nao tenha um filho
     b->esq = a;
     a->dir = nullptr;
-    if(a != getRaiz()) a->pai->dir = b;
+    if(a != getRaiz()) a->pai->dir = b; //Faz o pai apontar para o novo filho
     b->pai = a->pai;
     a->pai = b;
   }
@@ -254,12 +238,12 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
     filho = b->esq;
     b->esq = a;
     a->dir = filho;
-    if(a != getRaiz()) a->pai->dir = b;
+    if(a != getRaiz()) a->pai->dir = b;// Faz o pai apontar para o novo filho
     b->pai = a->pai;
     a->pai = b;
   }
-  //a->altura = 1 + max(Altura(a->esq),Altura(a->dir));
-  //b->altura = 1 + max(Altura(b->esq),Altura(b->dir));
+  AlteraAltura(a);// Recalcula a altura do nodo
+  AlteraAltura(b);// Recalcula a altura do nodo
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
@@ -274,12 +258,18 @@ NodoABP* ABP::RotacionaED(NodoABP *a, NodoABP *b){//Rotacao Esquerda-Direita
 NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){
   NodoABP *c, *y; //Nodo filho de b e nodo que sera retornado com a nova arvore
 
-  c=  RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
+  c =  RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
   y = RotacionaDD(a,c);//RotacaoDD em toda arvore
 
   return y;
 }
 // ************************************
+
+void ABP::AlteraAltura(NodoABP *nodo){//Altera a altura dos Nodos
+  //cout << nodo->info << " " << nodo->altura << endl;
+  nodo->altura = 1 + max(Altura(nodo->esq),Altura(nodo->dir));
+  //cout << nodo->info << " " << nodo->altura << endl;
+}
 
 void ABP::CriaFilho(){//Chama a funcao que cria os filhos
   CriaFilho(Raiz);
@@ -313,16 +303,29 @@ void ABP::CaminhaPOSBalanceado(NodoABP *nodo)//Percorre o nodo usando o caminho 
   CaminhaPOSBalanceado(nodo->esq);
   CaminhaPOSBalanceado(nodo->dir);  
   //cout << nodo->info << endl;
-  if(FatorBalanceamento(nodo) > 1 && Altura(nodo->esq) > Altura(nodo->dir)){
+  if(FatorBalanceamento(nodo) > 1 /*&& nodo->info < nodo->esq->info*/){
     
     nodo = RotacionaEE(nodo,nodo->esq);
+    //GeraDOT();
     cout << nodo->info << " ESQ" << endl;
   }
-  if(FatorBalanceamento(nodo) > 1 && Altura(nodo->dir) > Altura(nodo->esq)){
-    
+  if(FatorBalanceamento(nodo) < -1 /*&& nodo->info > nodo->dir->info*/){// Se perde aqui
+    //cout << FatorBalanceamento(nodo) << endl;
     nodo = RotacionaDD(nodo,nodo->dir);
-    cout << nodo->info << " Direita" << endl;
+    //cout << nodo->info << " Direita" << endl;
   }
-  //GeraDOT();
+  /*if(FatorBalanceamento(nodo) > 1 && nodo->info > nodo->esq->info){
+    cout << "ED" << endl;
+    cout << nodo->info << endl;
+    nodo = RotacionaED(nodo,nodo->esq);
+        cout << nodo->info << endl;
+
+  }
+  if(FatorBalanceamento(nodo) < -1 && nodo->info < nodo->dir->info){
+     cout << "DE" << endl;
+    cout << nodo->info << endl;
+    nodo = RotacionaDE(nodo,nodo->dir);
+  }*/
+  GeraDOT();
   
 }
