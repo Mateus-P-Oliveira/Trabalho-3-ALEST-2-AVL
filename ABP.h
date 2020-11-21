@@ -40,10 +40,11 @@ public:
   NodoABP *RotacionaDD(NodoABP *a, NodoABP *b);// Faz a Rotacao para Direita-Direita
   NodoABP *RotacionaED(NodoABP *a, NodoABP *b);// Faz a Rotacao para Esquerda-Direita
   NodoABP *RotacionaDE(NodoABP *a, NodoABP *b); // Faz a Rotacao para Direita-Esquerda
-  void CaminhaPOSBalanceado(NodoABP *n);//Percorre o caminho pos e aplica o balanceamento
+  void BalanceiaNodo(NodoABP *n);//Percorre o caminho pos e aplica o balanceamento
   int FatorBalanceamento(NodoABP *n);// Faz o fator balanceamento
   void CriaFilho();//Chama a funcao cria filho
   int Altura(NodoABP *n);//Calcula a altura do nodo
   void AlteraAltura(NodoABP *n);//Altera a altura dos nodo
+  void MovendoPelaArvore();
 };
 #endif 

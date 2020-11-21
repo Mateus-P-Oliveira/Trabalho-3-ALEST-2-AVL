@@ -4,8 +4,33 @@ using namespace std;
 #include "ABP.h"
 
 int main() {
+
   
   ABP B;
+  
+
+  B.insere(100);
+  B.insere(90);
+  B.insere(50);
+  B.insere(40);
+  B.insere(30);
+  B.insere(20);
+  B.insere(101);
+  B.GeraDOT();
+ 
+  //NodoABP *NodoDesbalanceado;
+  //NodoDesbalanceado = B.busca(100);
+  //B.RotacionaDD(NodoDesbalanceado,NodoDesbalanceado->dir);
+  
+  //B.GeraDOT();
+  
+  B.MovendoPelaArvore();
+  //B.CaminhaCENTRAL();
+  B.GeraDOT();
+  
+ 
+ 
+ /*ABP B;
   
   for(int i=10;i>5;i--)
         B.insere(i);
@@ -24,6 +49,6 @@ int main() {
   
   //B.AplicaBalanceamento();
   //B.CaminhaCENTRAL();
-  //B.GeraDOT();
+  //B.GeraDOT();*/
   return 0;
 }

@@ -1,4 +1,3 @@
-
 #include "ABP.h"
 
 ABP::ABP () // Cria a arvore sem nada
@@ -196,27 +195,33 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 
 // ************************************ // So irei fazer as rotacoes nesse caso 
-//Em todos casos a e par de b 
-NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
-  if(a == getRaiz()) Raiz = b; // B que e o filho vira a nova raiz
-    
-  if(b->dir == nullptr){ // Caso B nao tenha filho
+//Em todos casos a e pai de b 
+NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)
+{  
+   if (b->dir == nullptr)
+  {
+    // Caso B nao tenha filho
     b->dir = a; // A vira a raiz a direita de b
     a->esq = nullptr; //A deixa sua raiz esquerda apontando para o vazio
-    if(a != getRaiz()) a->pai->esq = b; // Faz o pai de a apontar para a esq
+    if(a != getRaiz()) a->pai->esq = b; // Faz o pai de a apontar para a esq     
+    
     b->pai = a->pai;//Define o pai do nodo b como sendo o pai de a
     a->pai = b; //Define o pai do nodo a
+    //cout << a->pai->info << endl;
   }
-  else{//Caso B tenha um filho
+  else
+  { //Caso B tenha um filho
     NodoABP *filho;
     filho = b->dir;
     b->dir = a;
     a->esq = filho;
-    if(a != getRaiz()) a->pai->esq = b; // Faz o pai de a apontar para a esq
+    if(a != getRaiz())
+        a->pai->esq = b; // Faz o pai de a apontar para a esq
     b->pai = a->pai;
     a->pai = b;
-    }
-
+  }
+  if(a == getRaiz())
+        Raiz = b; // B que e o filho vira a nova raiz
   AlteraAltura(a); //Recalcula a altura do nodo
   AlteraAltura(b); //Recalcula a altura do nodo
   
@@ -224,9 +229,8 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b){ // Rotacao Esquerda-Esquerda
 }
 // ************************************
 NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
-  if(a == getRaiz()) Raiz = b;//Caso A seja a raiz o B vira a raiz
-  
-  if(b->esq == nullptr){//Caso B nao tenha um filho
+
+   if(b->esq == nullptr){//Caso B nao tenha um filho
     b->esq = a;
     a->dir = nullptr;
     if(a != getRaiz()) a->pai->dir = b; //Faz o pai apontar para o novo filho
@@ -242,8 +246,10 @@ NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
     b->pai = a->pai;
     a->pai = b;
   }
+  if(a == getRaiz()) Raiz = b;//Caso A seja a raiz o B vira a raiz
   AlteraAltura(a);// Recalcula a altura do nodo
   AlteraAltura(b);// Recalcula a altura do nodo
+  
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
@@ -285,47 +291,75 @@ void ABP::CriaFilho(NodoABP *nodo){
 
 void ABP::AplicaBalanceamento(){//Chama a funcao aplica balanceamento
   CriaFilho(); // Cria os filhos para os ponteiros nao se perderem
-  CaminhaPOSBalanceado(Raiz);
-
+  BalanceiaNodo(Raiz);
+  CriaFilho(); 
+  AlteraAltura(Raiz); //Altera altura apos aplicar o balanceamento
 }
 
 int ABP::FatorBalanceamento(NodoABP *n){//Aplica o fator balanceamento so contando as arvores que contam
   if(n == nullptr) return 0;
-  return Altura(n->esq) - Altura(n->dir);  
-}
+  if(n->dir== nullptr && n->esq != nullptr){
+    //cout << n->esq->altura - 0 << endl;
+    return n->esq->altura - 0;
+  } 
+  else if(n->esq== nullptr && n->dir != nullptr){
+    //cout << 0 - n->dir->altura << endl;
+    return 0 - n->dir->altura;
+  }
+  else if(n->esq == nullptr && n->dir == nullptr){
+    return 0;
+  }
+  else{
+   // cout <<n->esq->altura - n->dir->altura << endl;
+    return n->esq->altura - n->dir->altura;  
+  }
+  }  
 
 // *************************************
-void ABP::CaminhaPOSBalanceado(NodoABP *nodo)//Percorre o nodo usando o caminho pos fixado. Ver slides arvores de pesquisa binarias
+void ABP::BalanceiaNodo(NodoABP *nodo)//Percorre o nodo usando o caminho pos fixado. Ver slides arvores de pesquisa binarias
 {   
-  
-  if(nodo == NULL) return;
-  
-  CaminhaPOSBalanceado(nodo->esq);
-  CaminhaPOSBalanceado(nodo->dir);  
-  //cout << nodo->info << endl;
-  if(FatorBalanceamento(nodo) > 1 /*&& nodo->info < nodo->esq->info*/){
+      
+  if(FatorBalanceamento(nodo) > 1 ){ //EE
     
     nodo = RotacionaEE(nodo,nodo->esq);
-    //GeraDOT();
-    cout << nodo->info << " ESQ" << endl;
+    
   }
-  if(FatorBalanceamento(nodo) < -1 /*&& nodo->info > nodo->dir->info*/){// Se perde aqui
-    //cout << FatorBalanceamento(nodo) << endl;
+  if(FatorBalanceamento(nodo) < -1 ){ //DD
+    
     nodo = RotacionaDD(nodo,nodo->dir);
-    //cout << nodo->info << " Direita" << endl;
+    
   }
-  /*if(FatorBalanceamento(nodo) > 1 && nodo->info > nodo->esq->info){
-    cout << "ED" << endl;
-    cout << nodo->info << endl;
-    nodo = RotacionaED(nodo,nodo->esq);
-        cout << nodo->info << endl;
-
-  }
-  if(FatorBalanceamento(nodo) < -1 && nodo->info < nodo->dir->info){
-     cout << "DE" << endl;
-    cout << nodo->info << endl;
-    nodo = RotacionaDE(nodo,nodo->dir);
-  }*/
-  GeraDOT();
   
+  GeraDOT();
+}
+
+void ABP::MovendoPelaArvore(){
+  NodoABP *guia;
+  guia = Raiz;
+  CriaFilho();
+   while (guia->esq != nullptr)//Move Guia ate o ultimo valor da subarvore a esquerda
+    {
+      guia = guia->esq;
+    }
+    while(guia->pai != nullptr){
+       
+      cout << guia->info << endl;
+      cout << Altura(guia) << endl;
+      cout << Altura(guia->esq) << endl;
+      cout << Altura(guia->dir) << endl;
+            cout << FatorBalanceamento(guia) << endl;
+      if(abs(FatorBalanceamento(guia)) > 1) AplicaBalanceamento();
+      cout << "passou" << endl;
+      cout << guia->pai->info << endl;
+      guia = guia->pai;
+    }
+    cout << "TRoca" << endl;
+  while(guia->dir != nullptr){
+    cout << guia->info << endl;
+    cout << abs(FatorBalanceamento(guia)) << endl;
+    if(abs(FatorBalanceamento(guia)) > 1) AplicaBalanceamento();
+    guia = guia->dir;
+  }
+
+
 }
