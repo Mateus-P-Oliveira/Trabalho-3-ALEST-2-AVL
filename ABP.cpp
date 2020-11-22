@@ -39,18 +39,24 @@ int ABP::Altura(NodoABP *n){
 // ************************************
 NodoABP* ABP::insere(NodoABP *nodo, int n)//Insere o valor do nodo na arvore e decide para qual lado ele ira inserir de acordo com o tamnho de n
 {
+  int recebe;
   if (nodo == NULL) { // encontrou o local para inserir
     NodoABP *aux;
     aux = new NodoABP(n);
     return aux;
   }
   else {
-          if (n <= nodo->info) 
+          if (n <= nodo->info)
+          {
             nodo->esq =  insere(nodo->esq, n);
-          else 
+            
+          }
+          else
+          {
             nodo->dir = insere(nodo->dir, n);
+          }
     }
-    nodo->altura = 1 + max(Altura(nodo->esq),Altura(nodo->dir));
+    recebe = CalculaProfundidade(nodo);
     return nodo;
 }
 // ************************************
@@ -66,10 +72,16 @@ int ABP::CalculaProfundidade(NodoABP *n)// Calcula a profundidade da arvore
   {
     alturaEsq = CalculaProfundidade(n->esq);
     alturaDir = CalculaProfundidade(n->dir);
+      // PINHO
+    n->alturaEsq = alturaEsq;
+    n->alturaDir = alturaDir;
+
     return 1 + max (alturaEsq, alturaDir);//Max retorna o valor mais alto entre esq e direita, caso sejam iguais ele retorna esquerda
   }
   else return 0;
 }
+
+
 // ************************************
 int ABP::EncontraMenor() { //Encontra o nodo na ultima posicao
   NodoABP *aux = Raiz;
@@ -125,18 +137,26 @@ void ABP::CaminhaCENTRAL(NodoABP *nodo)//Percorre a arvore utilizando o caminho 
 
 }
 // ************************************
-void ABP::GeraConexoesDOT(NodoABP *nodo) //Gera as conexoes do nodo que sera inserido no arquivo para imprimi-lo
+void ABP::GeraConexoesDOT(NodoABP *nodo)
 {
     if(nodo == NULL) return;
+    
     GeraConexoesDOT(nodo->esq);
-    //   "nodeA":dir -> "nodeB";
+    //   "nodeA":esq -> "nodeB" [color="0.650 0.700 0.700"]
     if (nodo->esq)
-        cout << "\"node" << nodo->info << "\":esq -> \"node" << nodo->esq->info << "\"" << "[ label = " << nodo->altura << "]" << endl;
+        cout << "\"node" << nodo->info << "\":esq -> \"node" << nodo->esq->info << "\" " <<
+        "[label = " << nodo->alturaEsq << "]" << endl;
     GeraConexoesDOT(nodo->dir);
+    //   "nodeA":dir -> "nodeB";
     if (nodo->dir)
-        cout << "\"node" << nodo->info << "\":dir -> \"node" << nodo->dir->info << "\""<< "[ label = " << nodo->altura << "]" << endl;
+        cout << "\"node" << nodo->info << "\":dir -> \"node" << nodo->dir->info << "\" " <<
+        "[label = " << nodo->alturaDir << "]" <<endl;
+    
+    /*   if (nodo->pai)   //"node2":dir -> "node6" [label = 1]
+     cout << "\"node" << nodo->info << "\" -> \"node" << nodo->pai->info << "\" " <<
+     "[color=\"0.650 0.700 0.700\"]"<< endl;
+     */
 }
-
 void ABP::GeraNodosDOT(NodoABP *nodo)//Gera o nodo para o codigo imprimi-lo
 {
     if(nodo == NULL) return;
@@ -196,7 +216,7 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
 
 // ************************************ // So irei fazer as rotacoes nesse caso 
 //Em todos casos a e pai de b 
-NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)
+NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)// A nodo desbalanceado e b nodo a esq dele com quem ira trocar
 {  
    if (b->dir == nullptr)
   {
@@ -273,7 +293,9 @@ NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){
 
 void ABP::AlteraAltura(NodoABP *nodo){//Altera a altura dos Nodos
   //cout << nodo->info << " " << nodo->altura << endl;
-  nodo->altura = 1 + max(Altura(nodo->esq),Altura(nodo->dir));
+  //nodo->altura = 1 + max(Altura(nodo->esq),Altura(nodo->dir));
+  int recebe;
+  recebe = CalculaProfundidade(nodo);
   //cout << nodo->info << " " << nodo->altura << endl;
 }
 
@@ -289,48 +311,60 @@ void ABP::CriaFilho(NodoABP *nodo){
   CriaFilho(nodo->dir); 
 }
 
-void ABP::AplicaBalanceamento(){//Chama a funcao aplica balanceamento
+void ABP::AplicaBalanceamento(NodoABP *nodo){//Chama a funcao aplica balanceamento
   CriaFilho(); // Cria os filhos para os ponteiros nao se perderem
-  BalanceiaNodo(Raiz);
+  BalanceiaNodo(nodo);
   CriaFilho(); 
   AlteraAltura(Raiz); //Altera altura apos aplicar o balanceamento
 }
 
 int ABP::FatorBalanceamento(NodoABP *n){//Aplica o fator balanceamento so contando as arvores que contam
   if(n == nullptr) return 0;
-  if(n->dir== nullptr && n->esq != nullptr){
-    //cout << n->esq->altura - 0 << endl;
-    return n->esq->altura - 0;
-  } 
-  else if(n->esq== nullptr && n->dir != nullptr){
-    //cout << 0 - n->dir->altura << endl;
-    return 0 - n->dir->altura;
-  }
-  else if(n->esq == nullptr && n->dir == nullptr){
-    return 0;
-  }
-  else{
-   // cout <<n->esq->altura - n->dir->altura << endl;
-    return n->esq->altura - n->dir->altura;  
-  }
+  return n->alturaEsq - n->alturaDir;
   }  
-
+  
 // *************************************
 void ABP::BalanceiaNodo(NodoABP *nodo)//Percorre o nodo usando o caminho pos fixado. Ver slides arvores de pesquisa binarias
 {   
-      
-  if(FatorBalanceamento(nodo) > 1 ){ //EE
-    
-    nodo = RotacionaEE(nodo,nodo->esq);
-    
-  }
-  if(FatorBalanceamento(nodo) < -1 ){ //DD
-    
-    nodo = RotacionaDD(nodo,nodo->dir);
-    
-  }
   
-  GeraDOT();
+  if(FatorBalanceamento(nodo) > 1 && nodo->esq->alturaEsq > nodo->esq->alturaDir ){ //EE
+    cout << "Rotacao EE" << endl;
+    //nodo->imprime();
+    nodo = RotacionaEE(nodo,nodo->esq);
+    //cout << "Ponteiro " << endl;
+    //nodo->imprime();
+    
+  }
+  if(FatorBalanceamento(nodo) < -1 && nodo->dir->alturaDir > nodo->dir->alturaEsq ){ //DD
+    cout << "Rotacao DD" << endl;
+    //nodo->imprime();
+    nodo = RotacionaDD(nodo,nodo->dir);
+    //cout << "Ponteiro " << endl;
+    //nodo->imprime();
+  }
+  if(FatorBalanceamento(nodo) > 1 && nodo->esq->alturaEsq < nodo->esq->alturaDir){//ED
+    cout << "Rotacao ED" << endl;
+    //nodo->imprime();
+    nodo = RotacionaED(nodo,nodo->esq);
+    //cout << "Ponteiro " << endl;
+    //nodo->imprime();
+  }
+  if(FatorBalanceamento(nodo) < -1 && nodo->dir->alturaDir < nodo->dir->alturaEsq){ //DE
+    cout << "Rotacao DE" << endl;
+    //nodo->imprime();
+    nodo = RotacionaDE(nodo,nodo->dir);
+    //cout << "Ponteiro " << endl;
+    //nodo->imprime();
+  }
+  /*if(FatorBalanceamento(nodo) > 1 && nodo->esq->alturaEsq == nodo->esq->alturaDir){
+        cout << "Rotacao EE" << endl;
+        nodo = RotacionaEE(nodo,nodo->esq);
+
+  }
+  if(FatorBalanceamento(nodo) < -1 && nodo->dir->alturaDir == nodo->dir->alturaEsq ){ //DD
+        cout << "Rotacao DD " << endl;
+        nodo = RotacionaDD(nodo,nodo->dir);
+  }*/ 
 }
 
 void ABP::MovendoPelaArvore(){
@@ -341,25 +375,37 @@ void ABP::MovendoPelaArvore(){
     {
       guia = guia->esq;
     }
-    while(guia->pai != nullptr){
-       
-      cout << guia->info << endl;
-      cout << Altura(guia) << endl;
-      cout << Altura(guia->esq) << endl;
-      cout << Altura(guia->dir) << endl;
-            cout << FatorBalanceamento(guia) << endl;
-      if(abs(FatorBalanceamento(guia)) > 1) AplicaBalanceamento();
-      cout << "passou" << endl;
-      cout << guia->pai->info << endl;
+    while(guia->pai != nullptr){      
+
+      if(abs(FatorBalanceamento(guia)) > 1){
+       // cout << "Nodo a ser balanceado " << endl;
+        //guia->imprime();
+        //cout << "Fator Balanceamento " << endl;
+        //cout << FatorBalanceamento(guia) << endl;
+        AplicaBalanceamento(guia);
+        
+        //GeraDOT();
+      } 
       guia = guia->pai;
     }
-    cout << "TRoca" << endl;
-  while(guia->dir != nullptr){
-    cout << guia->info << endl;
-    cout << abs(FatorBalanceamento(guia)) << endl;
-    if(abs(FatorBalanceamento(guia)) > 1) AplicaBalanceamento();
+    cout << "Troca" << endl;
+    //Balanceamento nao ocorre quando for igual a altura das sub arvores
+  while(guia != nullptr){
+    
+    if(abs(FatorBalanceamento(guia)) > 1){
+      //cout << "Nodo a ser balanceado " << endl;
+        //guia->imprime();
+         //cout << "Fator Balanceamento " << endl;
+        //cout << FatorBalanceamento(guia) << endl;
+      AplicaBalanceamento(guia);
+    } 
     guia = guia->dir;
   }
 
 
+}
+
+
+void ABP::BalanceiaArvore(){
+  MovendoPelaArvore();
 }

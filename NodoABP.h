@@ -8,6 +8,7 @@ class NodoABP{
     NodoABP *esq;
     NodoABP *dir;
     int altura;
+    int alturaEsq, alturaDir; //PINHO
     NodoABP(int dado);
     void imprime();
 };
