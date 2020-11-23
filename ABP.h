@@ -47,5 +47,9 @@ public:
   void AlteraAltura(NodoABP *n);//Altera a altura dos nodo
   void MovendoPelaArvore();//Percorre a arvore
   void BalanceiaArvore();//Chama as funcoes de balanceamento
+  //Moviemntos Novos
+  void CaminhoArvore(NodoABP *nodo);
+  void Caminho(NodoABP *nodo);//Nao usar
+
 };
 #endif 

@@ -216,7 +216,7 @@ void ABP::CaminhaPOS() //Chama a funcao Caminha Pos
 
 // ************************************ // So irei fazer as rotacoes nesse caso 
 //Em todos casos a e pai de b 
-NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)// A nodo desbalanceado e b nodo a esq dele com quem ira trocar
+NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)// A nodo desbalanceado e B nodo a esq dele com quem ira trocar //Rotacao Esquerda-Esquerda
 {  
    if (b->dir == nullptr)
   {
@@ -248,7 +248,7 @@ NodoABP* ABP::RotacionaEE(NodoABP *a, NodoABP *b)// A nodo desbalanceado e b nod
   return b;//Retorna um ponteiro para B que ira indicar onde devo continuar com meu ponteiro de movimentacao
 }
 // ************************************
-NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// Rotacao Direita-Direita
+NodoABP* ABP::RotacionaDD(NodoABP *a, NodoABP *b){// A nodo desbalanceado e B nodo a dir dele com quem ira trocar // Rotacao Direita-Direita
 
    if(b->esq == nullptr){//Caso B nao tenha um filho
     b->esq = a;
@@ -281,7 +281,7 @@ NodoABP* ABP::RotacionaED(NodoABP *a, NodoABP *b){//Rotacao Esquerda-Direita
   return y;//Retorna o ponteiro para a nova arvore
 }
 // ************************************
-NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){
+NodoABP* ABP::RotacionaDE(NodoABP *a, NodoABP *b){//Rotacao Direita-Esquerda
   NodoABP *c, *y; //Nodo filho de b e nodo que sera retornado com a nova arvore
 
   c =  RotacionaEE(b,b->esq);//Rotacao EE na subarvore a direita
@@ -303,7 +303,7 @@ void ABP::CriaFilho(){//Chama a funcao que cria os filhos
   CriaFilho(Raiz);
 }
 
-void ABP::CriaFilho(NodoABP *nodo){
+void ABP::CriaFilho(NodoABP *nodo){//Cria a relacao pai filho
   if(nodo == NULL) return;
   if(nodo->esq != nullptr) nodo->esq->pai = nodo;
   if(nodo->dir != nullptr) nodo->dir->pai = nodo;  
@@ -328,7 +328,7 @@ void ABP::BalanceiaNodo(NodoABP *nodo)//Percorre o nodo usando o caminho pos fix
 {   
   
   if(FatorBalanceamento(nodo) > 1 && nodo->esq->alturaEsq > nodo->esq->alturaDir ){ //EE
-    cout << "Rotacao EE" << endl;
+    //cout << "Rotacao EE" << endl;
     //nodo->imprime();
     nodo = RotacionaEE(nodo,nodo->esq);
     //cout << "Ponteiro " << endl;
@@ -336,21 +336,21 @@ void ABP::BalanceiaNodo(NodoABP *nodo)//Percorre o nodo usando o caminho pos fix
     
   }
   if(FatorBalanceamento(nodo) < -1 && nodo->dir->alturaDir > nodo->dir->alturaEsq ){ //DD
-    cout << "Rotacao DD" << endl;
+    //cout << "Rotacao DD" << endl;
     //nodo->imprime();
     nodo = RotacionaDD(nodo,nodo->dir);
     //cout << "Ponteiro " << endl;
     //nodo->imprime();
   }
   if(FatorBalanceamento(nodo) > 1 && nodo->esq->alturaEsq < nodo->esq->alturaDir){//ED
-    cout << "Rotacao ED" << endl;
+    //cout << "Rotacao ED" << endl;
     //nodo->imprime();
     nodo = RotacionaED(nodo,nodo->esq);
     //cout << "Ponteiro " << endl;
     //nodo->imprime();
   }
   if(FatorBalanceamento(nodo) < -1 && nodo->dir->alturaDir < nodo->dir->alturaEsq){ //DE
-    cout << "Rotacao DE" << endl;
+    //cout << "Rotacao DE" << endl;
     //nodo->imprime();
     nodo = RotacionaDE(nodo,nodo->dir);
     //cout << "Ponteiro " << endl;
@@ -367,7 +367,38 @@ void ABP::BalanceiaNodo(NodoABP *nodo)//Percorre o nodo usando o caminho pos fix
   }*/ 
 }
 
-void ABP::MovendoPelaArvore(){
+void ABP::BalanceiaArvore(){
+  
+  CaminhoArvore(Raiz);
+  //CaminhoArvore(Raiz);
+  //Caso sobre algo desbalanceado por nao cair nos if anteriores
+
+  
+}
+
+void ABP::CaminhoArvore(NodoABP *aux){//Move pela Arvore usando o caminhamento POS
+
+  if(aux == NULL) return;
+
+  CaminhoArvore(aux->esq);
+  CaminhoArvore(aux->dir); 
+ 
+  if(abs(FatorBalanceamento(aux)) > 1) AplicaBalanceamento(aux);
+  //GeraDOT();
+
+}
+
+void ABP::Caminho(NodoABP *aux){ //Nao usar 
+  if(aux == NULL) return;
+        if(abs(FatorBalanceamento(aux)) > 1) AplicaBalanceamento(aux);
+
+  CaminhoArvore(aux->esq);\
+
+  CaminhoArvore(aux->dir); 
+ 
+}
+
+void ABP::MovendoPelaArvore(){//Possui erros na movimentacao a direita
   NodoABP *guia;
   guia = Raiz;
   CriaFilho();
@@ -403,9 +434,4 @@ void ABP::MovendoPelaArvore(){
   }
 
 
-}
-
-
-void ABP::BalanceiaArvore(){
-  MovendoPelaArvore();
 }
